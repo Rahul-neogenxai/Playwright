@@ -1,0 +1,25 @@
+{
+  "name": "self",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "playwright": "^1.57.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rahul-neogenxai/Playwright.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Rahul-neogenxai/Playwright/issues"
+  },
+  "homepage": "https://github.com/Rahul-neogenxai/Playwright#readme"
+}
