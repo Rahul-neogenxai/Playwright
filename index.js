@@ -1,6 +1,7 @@
 import { chromium } from 'playwright';
 import * as dotenv from 'dotenv';
 import readline from 'readline';
+import fs from 'fs';
 
 dotenv.config();
 
@@ -71,7 +72,82 @@ if (redirectedUrl.startsWith(loginUrl)) {
   }
 }
 
-await page.screenshot({ path: 'example.png' });
+// After ensuring you are on the target page
+// Wait for the toggle to be visible
+await page.waitForSelector('label.xtoggler-btn-wrapper', { timeout: 5000 });
+
+// Get all toggle elements
+const toggles = await page.$$('label.xtoggler-btn-wrapper');
+
+// Click the third toggle (index 2)
+if (toggles.length >= 3) {
+  const box = await toggles[2].boundingBox();
+  await page.mouse.click(
+    box.x + box.width / 2,
+    box.y + box.height / 2
+  );
+} else {
+  console.log('Less than 3 toggles found.');
+}
+
+// Read symbols from JSON
+const symbols = JSON.parse(fs.readFileSync('d:/Self/Playwright/symbols.json', 'utf-8'));
+
+// Use the first symbol and qty
+const { symbol: symbolToEnter, qty } = symbols[0];
+
+// Fill symbol (name)
+await page.waitForSelector('input[formcontrolname="symbol"]', { timeout: 5000 });
+await page.fill('input[formcontrolname="symbol"]', symbolToEnter);
+
+// Wait for the dropdown option matching the symbol to appear and click it
+const dropdownSelector = `.dropdown-item span strong:text-is("${symbolToEnter}")`;
+await page.waitForSelector(dropdownSelector, { timeout: 5000 });
+await page.click(dropdownSelector);
+
+// Fill quantity
+await page.waitForSelector('input[formcontrolname="quantity"]', { timeout: 5000 });
+await page.fill('input[formcontrolname="quantity"]', qty.toString());
+
+// Get the Pre Close price robustly
+const preCloseLabel = page.locator('label.order__form--label', { hasText: 'Pre Close' }).first();
+if (await preCloseLabel.isVisible()) {
+  // Get the parent div
+  const preCloseDiv = preCloseLabel.locator('..');
+  // Get the <b> element inside the same div
+  const priceElement = preCloseDiv.locator('b').first();
+  const preClosePriceText = await priceElement.textContent();
+  const preClosePrice = parseFloat(preClosePriceText.trim());
+  const pricePlus10Percent = (preClosePrice * 1.1).toFixed(2);
+
+  console.log('Pre Close Price:', preClosePrice);
+  console.log('Price + 10%:', pricePlus10Percent);
+
+  // Fill the price input with only the integer part
+  const priceOneDecimal = pricePlus10Percent.includes('.')
+    ? pricePlus10Percent.split('.')[0] + '.' + pricePlus10Percent.split('.')[1][0]
+    : pricePlus10Percent;
+  await page.fill('input[formcontrolname="price"]', priceOneDecimal);
+
+  console.log('Pressing Enter repeatedly until trade is executed...', priceOneDecimal);
+  let tradeExecuted = false;
+  let i=0;
+  while (!tradeExecuted) {
+    await page.keyboard.press('Enter');
+    i++;
+    console.log(i);
+    try {
+      await page.waitForSelector('.trade-success-message, .order-confirmation', { timeout: 500 });
+      tradeExecuted = true;
+      console.log('Trade executed!');
+    } catch {
+      // Not found yet, keep pressing
+    }
+  }
+} else {
+  console.log('Pre Close label not found.');
+}
+
 await page.waitForTimeout(5000);
 console.log('Redirected to:', page.url());
 await browser.close();

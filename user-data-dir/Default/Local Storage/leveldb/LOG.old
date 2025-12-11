@@ -1,2 +1,3 @@
-2025/12/09-16:08:27.736 6b4 Creating DB d:\Self\Playwright\user-data-dir\Default\Local Storage\leveldb since it was missing.
-2025/12/09-16:08:27.760 6b4 Reusing MANIFEST d:\Self\Playwright\user-data-dir\Default\Local Storage\leveldb/MANIFEST-000001
+2025/12/11-14:41:54.020 66c0 Reusing MANIFEST d:/Self/Playwright/user-data-dir\Default\Local Storage\leveldb/MANIFEST-000001
+2025/12/11-14:41:54.048 66c0 Recovering log #7
+2025/12/11-14:41:54.049 66c0 Reusing old log d:/Self/Playwright/user-data-dir\Default\Local Storage\leveldb/000007.log 
