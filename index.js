@@ -131,13 +131,16 @@ if (await preCloseLabel.isVisible()) {
 
   console.log('Pressing Enter repeatedly until trade is executed...', priceOneDecimal);
   let tradeExecuted = false;
-  let i=0;
+  let i = 0;
   while (!tradeExecuted) {
-    await page.keyboard.press('Enter');
+    await Promise.all([
+      page.keyboard.press('Enter'),
+      page.waitForTimeout(10) // minimal delay to avoid overwhelming the browser
+    ]);
     i++;
-    console.log(i);
+    if (i % 10 === 0) console.log(i); // log every 10 attempts
     try {
-      await page.waitForSelector('.trade-success-message, .order-confirmation', { timeout: 500 });
+      await page.waitForSelector('.trade-success-message, .order-confirmation', { timeout: 100 });
       tradeExecuted = true;
       console.log('Trade executed!');
     } catch {
