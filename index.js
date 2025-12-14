@@ -135,14 +135,13 @@ if (await preCloseLabel.isVisible()) {
   while (!tradeExecuted) {
     await Promise.all([
       page.keyboard.press('Enter'),
-      page.waitForTimeout(10) // minimal delay to avoid overwhelming the browser
     ]);
     i++;
     if (i % 10 === 0) console.log(i); // log every 10 attempts
     try {
-      await page.waitForSelector('.trade-success-message, .order-confirmation', { timeout: 100 });
+      await page.waitForSelector('.toast-title.ng-star-inserted:text-is("Success")', { timeout: 20 });
       tradeExecuted = true;
-      console.log('Trade executed!');
+      console.log('Trade executed Sucessfully!', symbols);
     } catch {
       // Not found yet, keep pressing
     }
