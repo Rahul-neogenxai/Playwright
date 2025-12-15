@@ -5,14 +5,14 @@ import fs from 'fs';
 
 dotenv.config();
 
-const browser = await chromium.launchPersistentContext('d:/Self/Playwright/user-data-dir',{ 
+const browser = await chromium.launchPersistentContext('./user-data-dir',{ 
   headless: false,
   userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' 
 });
 const page = await browser.newPage();
 
-const targetUrl = 'https://tms49.nepsetms.com.np/tms/me/memberclientorderentry';
-const loginUrl = 'https://tms49.nepsetms.com.np/login';
+const targetUrl = process.env.TARGETURL
+const loginUrl = process.env.LOGINURL
 
 await page.goto(targetUrl, { waitUntil: 'networkidle' });
 
@@ -91,7 +91,7 @@ if (toggles.length >= 3) {
 }
 
 // Read symbols from JSON
-const symbols = JSON.parse(fs.readFileSync('d:/Self/Playwright/symbols.json', 'utf-8'));
+const symbols = JSON.parse(fs.readFileSync('./symbols.json', 'utf-8'));
 
 // Use the first symbol and qty
 const { symbol: symbolToEnter, qty } = symbols[0];
