@@ -1,3 +1,5 @@
-2025/12/11-14:45:43.592 6310 Reusing MANIFEST d:\Self\Playwright\user-data-dir\Default\Local Storage\leveldb/MANIFEST-000001
-2025/12/11-14:45:43.601 6310 Recovering log #7
-2025/12/11-14:45:43.604 6310 Reusing old log d:\Self\Playwright\user-data-dir\Default\Local Storage\leveldb/000007.log 
+2025/12/16-11:25:37.405 c30 Reusing MANIFEST D:\Self\Playwright\user-data-dir\Default\Local Storage\leveldb/MANIFEST-000001
+2025/12/16-11:25:37.411 c30 Recovering log #7
+2025/12/16-11:25:37.413 c30 Level-0 table #9: started
+2025/12/16-11:25:37.424 c30 Level-0 table #9: 56879 bytes OK
+2025/12/16-11:25:37.438 c30 Delete type=0 #7
