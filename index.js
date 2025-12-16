@@ -123,31 +123,31 @@ if (await preCloseLabel.isVisible()) {
   console.log('Pre Close Price:', preClosePrice);
   console.log('Price + 10%:', pricePlus10Percent);
 
-//   // Fill the price input with only the integer part
-//   const priceOneDecimal = pricePlus10Percent.includes('.')
-//     ? pricePlus10Percent.split('.')[0] + '.' + pricePlus10Percent.split('.')[1][0]
-//     : pricePlus10Percent;
-//   await page.fill('input[formcontrolname="price"]', priceOneDecimal);
+  // Fill the price input with only the integer part
+  const priceOneDecimal = pricePlus10Percent.includes('.')
+    ? pricePlus10Percent.split('.')[0] + '.' + pricePlus10Percent.split('.')[1][0]
+    : pricePlus10Percent;
+  await page.fill('input[formcontrolname="price"]', priceOneDecimal);
 
-//   console.log('Pressing Enter repeatedly until trade is executed...', priceOneDecimal);
-//   let tradeExecuted = false;
-//   let i = 0;
-//   while (!tradeExecuted) {
-//     await Promise.all([
-//       page.keyboard.press('Enter'),
-//     ]);
-//     i++;
-//     if (i % 10 === 0) console.log(i); // log every 10 attempts
-//     try {
-//       await page.waitForSelector('.toast-title.ng-star-inserted:text-is("Success")', { timeout: 20 });
-//       tradeExecuted = true;
-//       console.log('Trade executed Sucessfully!', symbols);
-//     } catch {
-//       // Not found yet, keep pressing
-//     }
-//   }
-// } else {
-//   console.log('Pre Close label not found.');
+  console.log('Pressing Enter repeatedly until trade is executed...', priceOneDecimal);
+  let tradeExecuted = false;
+  let i = 0;
+  while (!tradeExecuted) {
+    await Promise.all([
+      page.keyboard.press('Enter'),
+    ]);
+    i++;
+    if (i % 10 === 0) console.log(i); // log every 10 attempts
+    try {
+      await page.waitForSelector('.toast-title.ng-star-inserted:text-is("Success")', { timeout: 20 });
+      tradeExecuted = true;
+      console.log('Trade executed Sucessfully!', symbols);
+    } catch {
+      // Not found yet, keep pressing
+    }
+  }
+} else {
+  console.log('Pre Close label not found.');
 }
 
 await page.waitForTimeout(5000);
