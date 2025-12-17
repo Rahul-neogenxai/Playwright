@@ -10,6 +10,7 @@ const browser = await chromium.launchPersistentContext('./user-data-dir',{
   userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' 
 });
 const page = await browser.newPage();
+page.setDefaultTimeout(0);
 
 const targetUrl = process.env.TARGETURL
 const loginUrl = process.env.LOGINURL
@@ -130,23 +131,25 @@ if (await preCloseLabel.isVisible()) {
   await page.fill('input[formcontrolname="price"]', priceOneDecimal);
 
   console.log('Pressing Enter repeatedly until trade is executed...', priceOneDecimal);
+
   let tradeExecuted = false;
   let i = 0;
+
+  // Start background toast watcher
+  const toastPromise = waitForSuccessToast(page);
+
   while (!tradeExecuted) {
-    await Promise.all([
-      page.keyboard.press('Enter'),
-    ]);
+    await page.keyboard.press('Enter');
     i++;
-    if (i % 10 === 0) console.log(i); // log every 10 attempts
-    try {
-      await page.waitForSelector('span.toast-title', { timeout: 2000 });
-      const toastText = await page.textContent('span.toast-title');
-      if (toastText && toastText.trim() === 'Success') {
-        tradeExecuted = true;
-        console.log('Trade executed Sucessfully!', symbols);
-      }  
-    } catch {
-      // Not found yet, keep pressing
+    if (i % 10 === 0) console.log(i);
+
+    // Check if toastPromise is resolved
+    if (await Promise.race([
+      toastPromise.then(() => true),
+      new Promise(resolve => setTimeout(() => resolve(false), 100)) // short delay to keep loop responsive
+    ])) {
+      tradeExecuted = true;
+      console.log('Trade executed Sucessfully!', symbols);
     }
   }
 } else {
@@ -157,3 +160,11 @@ await page.waitForTimeout(5000);
 console.log('Redirected to:', page.url());
 await browser.close();
 console.log('Screenshot saved as example.png');
+
+// Helper function to resolve when success toast appears
+function waitForSuccessToast(page) {
+  return page.waitForFunction(() => {
+    const el = document.querySelector('span.toast-title');
+    return el && el.textContent.trim() === 'Success';
+  }, { timeout: 0 }); // 0 = no timeout, wait indefinitely
+}
