@@ -139,9 +139,12 @@ if (await preCloseLabel.isVisible()) {
     i++;
     if (i % 10 === 0) console.log(i); // log every 10 attempts
     try {
-      await page.waitForSelector('.toast-title.ng-star-inserted:text-is("Success")', { timeout: 20 });
-      tradeExecuted = true;
-      console.log('Trade executed Sucessfully!', symbols);
+      await page.waitForSelector('span.toast-title', { timeout: 2000 });
+      const toastText = await page.textContent('span.toast-title');
+      if (toastText && toastText.trim() === 'Success') {
+        tradeExecuted = true;
+        console.log('Trade executed Sucessfully!', symbols);
+      }  
     } catch {
       // Not found yet, keep pressing
     }
