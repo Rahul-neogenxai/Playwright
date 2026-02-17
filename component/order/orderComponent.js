@@ -1,7 +1,7 @@
-/**
+/*
  * Place an order directly via API using Playwright's browser context.
  * @param {object} page - Playwright page instance (already logged in and ready)
- * @param {object} params - { symbolToEnter, qty, priceOneDecimal, securityId, clientId, clientMemberCode, notsUniqueClientCode }
+ * @param {object} params - { symbolToEnter, qty, priceOneDecimal, securityId, clientId, clientMemberCode, notsUniqueClientCode, hostSessionId }
  */
 export async function placeOrderViaApi(page, {
   symbolToEnter,
@@ -10,7 +10,9 @@ export async function placeOrderViaApi(page, {
   securityId,
   clientId,
   clientMemberCode,
-  notsUniqueClientCode
+  notsUniqueClientCode,
+  hostSessionId
+  
 }) {
   try {
     // 1. Get cookies and XSRF token from the browser context
@@ -32,16 +34,16 @@ export async function placeOrderViaApi(page, {
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       'origin': 'https://tms48.nepsetms.com.np',
       'referer': 'https://tms48.nepsetms.com.np/tms/me/memberclientorderentry',
-      'host-session-id': 'TWpRPS02ZjMxNTE0Yi1lNTI5LTQyYmYtYTNmMy0wN2U3NGIzYWZkOTc=',
+      'host-session-id': hostSessionId,
       'membercode': '48', 
       'request-owner': '109298' 
     };
 
     // Print all headers being sent
-    console.log('Order API headers:');
-    Object.entries(headers).forEach(([key, value]) => {
-      console.log(`${key}: ${value}`);
-    });
+    // console.log('Order API headers:');
+    // Object.entries(headers).forEach(([key, value]) => {
+    //   console.log(`${key}: ${value}`);
+    // });
 
     // 3. Prepare order body
     const orderBody = {
@@ -52,7 +54,7 @@ export async function placeOrderViaApi(page, {
             disclosedQuantity: 0,
             orderValidity: { id: 1, orderValidityCode: "DAY" },
             triggerPrice: 0,
-            orderPrice: parseFloat(269.4),
+            orderPrice: parseFloat(priceOneDecimal),
             orderQuantity: parseInt(qty, 10),
             remainingOrderQuantity: parseInt(qty, 10),
             marketType: { id: 2, marketType: "Continuous" }
@@ -123,7 +125,7 @@ export async function placeOrderViaApi(page, {
     };
 
     // Print the payload being sent
-    console.log('Order API payload:', JSON.stringify(orderBody, null, 2));
+    // console.log('Order API payload:', JSON.stringify(orderBody, null, 2));
 
     // 4. Send the POST request using Playwright's page.request API
     const response = await page.request.post(
@@ -135,7 +137,7 @@ export async function placeOrderViaApi(page, {
     );
 
     const rawText = await response.text();
-    console.log('Order API raw response:', rawText);
+    // console.log('Order API raw response:', rawText);
 
     let result;
     try {
