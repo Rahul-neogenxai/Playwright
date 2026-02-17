@@ -1,5 +1,7 @@
+import axios from 'axios';
+
 /*
- * Place an order directly via API using Playwright's browser context.
+ * Place an order directly via API using axios.
  * @param {object} page - Playwright page instance (already logged in and ready)
  * @param {object} params - { symbolToEnter, qty, priceOneDecimal, securityId, clientId, clientMemberCode, notsUniqueClientCode, hostSessionId }
  */
@@ -12,7 +14,6 @@ export async function placeOrderViaApi(page, {
   clientMemberCode,
   notsUniqueClientCode,
   hostSessionId
-  
 }) {
   try {
     // 1. Get cookies and XSRF token from the browser context
@@ -20,10 +21,6 @@ export async function placeOrderViaApi(page, {
     const cookieHeader = cookies.map(c => `${c.name}=${c.value}`).join('; ');
     const xsrfCookie = cookies.find(c => c.name === 'XSRF-TOKEN');
     const xsrfToken = xsrfCookie ? xsrfCookie.value : '';
-
-    // Dynamically get host-session-id from cookies
-    // const sessionIdCookie = cookies.find(c => c.name === 'host-session-id');
-    // const hostSessionId = sessionIdCookie ? sessionIdCookie.value : '';
 
     // 2. Prepare headers
     const headers = {
@@ -35,15 +32,9 @@ export async function placeOrderViaApi(page, {
       'origin': 'https://tms48.nepsetms.com.np',
       'referer': 'https://tms48.nepsetms.com.np/tms/me/memberclientorderentry',
       'host-session-id': hostSessionId,
-      'membercode': '48', 
-      'request-owner': '109298' 
+      'membercode': '48',
+      'request-owner': '109298'
     };
-
-    // Print all headers being sent
-    // console.log('Order API headers:');
-    // Object.entries(headers).forEach(([key, value]) => {
-    //   console.log(`${key}: ${value}`);
-    // });
 
     // 3. Prepare order body
     const orderBody = {
@@ -124,29 +115,22 @@ export async function placeOrderViaApi(page, {
       exchangeOrderId: null
     };
 
-    // Print the payload being sent
-    // console.log('Order API payload:', JSON.stringify(orderBody, null, 2));
-
-    // 4. Send the POST request using Playwright's page.request API
-    const response = await page.request.post(
+    // 4. Send the POST request using axios
+    const response = await axios.post(
       'https://tms48.nepsetms.com.np/tmsapi/orderApi/order/',
-      {
-        headers,
-        data: orderBody
-      }
+      orderBody,
+      { headers }
     );
 
-    const rawText = await response.text();
-    // console.log('Order API raw response:', rawText);
-
-    let result;
-    try {
-      result = JSON.parse(rawText);
-    } catch (err) {
-      return { success: false, error: rawText };
-    }
-    return result;
+    return response.data;
   } catch (err) {
+    // Handle axios/network errors
+    if (err.response) {
+      return { success: false, error: `Request failed with status code ${err.response.status}` };
+    }
+    if (err.code === 'ECONNRESET') {
+      return { success: false, error: 'socket hang up' };
+    }
     return { success: false, error: err.message || err };
   }
 }
