@@ -140,7 +140,7 @@ if (await preCloseLabel.isVisible()) {
   console.log('Buying started.......');
 
   while (!tradeExecuted) {
-    for (let j = 0; j < 20; j++){
+    for (let j = 0; j < 1; j++){
       await page.keyboard.press('Enter');
       i++;
     }
@@ -148,7 +148,7 @@ if (await preCloseLabel.isVisible()) {
     // Check if toastPromise is resolved
     if (await Promise.race([
       toastPromise.then(() => true),
-      new Promise(resolve => setTimeout(() => resolve(false), 100)) // short delay to keep loop responsive
+      new Promise(resolve => setTimeout(() => resolve(false), 100)) 
     ])) {
       tradeExecuted = true;
       console.log('Trade executed Sucessfully!', symbols);
