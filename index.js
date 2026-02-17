@@ -137,11 +137,13 @@ if (await preCloseLabel.isVisible()) {
 
   // Start background toast watcher
   const toastPromise = waitForSuccessToast(page);
+  console.log('Buying started.......');
 
   while (!tradeExecuted) {
-    await page.keyboard.press('Enter');
-    i++;
-    if (i % 10 === 0) console.log(i);
+    for (let j = 0; j < 20; j++){
+      await page.keyboard.press('Enter');
+      i++;
+    }
 
     // Check if toastPromise is resolved
     if (await Promise.race([
