@@ -92,7 +92,7 @@ dotenv.config();
     }
 
     const symbols = JSON.parse(fs.readFileSync('./symbols.json', 'utf-8'));
-    const { symbol: symbolToEnter, qty, securityId, clientId, clientMemberCode, notsUniqueClientCode } = symbols[0];
+    const { symbol: symbolToEnter, qty, securityId, exchangeSecurityId, clientId, clientMemberCode, notsUniqueClientCode } = symbols[0];
 
     await page.waitForSelector('input[formcontrolname="symbol"]', { timeout: 5000 });
     await page.fill('input[formcontrolname="symbol"]', symbolToEnter);
@@ -126,22 +126,26 @@ dotenv.config();
 
       while (true) {
         try {
-          // Check if page is closed
-          if (page.isClosed()) {
-            console.error('Page is closed. Exiting loop.');
-            break;
-          }
-
           attempt++;
+
+          // Refetch cookies and XSRF token before each attempt
+          const cookies = await page.context().cookies();
+          const cookieHeader = cookies.map(c => `${c.name}=${c.value}`).join('; ');
+          const xsrfCookie = cookies.find(c => c.name === 'XSRF-TOKEN');
+          const xsrfToken = xsrfCookie ? xsrfCookie.value : '';
+
           apiResult = await placeOrderViaApi(page, {
             symbolToEnter,
             qty,
             priceOneDecimal,
             securityId,
+            exchangeSecurityId,
             clientId,
             clientMemberCode,
             notsUniqueClientCode,
-            hostSessionId: latestHostSessionId
+            hostSessionId: latestHostSessionId,
+            cookieHeader,      
+            xsrfToken        
           });
 
           console.log(`Attempt ${attempt}:`, apiResult);
@@ -151,10 +155,18 @@ dotenv.config();
             break;
           }
 
-          // Always wait 500ms between attempts
+          if (
+            apiResult.error &&
+            apiResult.error.includes('401') &&
+            !reloadedOn401
+          ) {
+            console.log('Received 401. Reloading page and retrying once...');
+            await page.reload({ waitUntil: 'networkidle' });
+            continue; // Retry immediately after reload
+          }
+
           await page.waitForTimeout(500);
 
-          // If network/server error, wait longer
           if (apiResult.error && (
             apiResult.error.includes('502 Bad Gateway') ||
             apiResult.error.includes('socket hang up')
@@ -165,7 +177,6 @@ dotenv.config();
         } catch (err) {
           console.error('Error in loop:', err);
           await page.waitForTimeout(2000);
-          // Optionally, break if too many consecutive errors
         }
       }
 

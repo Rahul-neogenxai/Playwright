@@ -3,6 +3,7 @@
     "symbol": "NLO", 
     "qty": 10,
     "securityId": 198,
+    "exchangeSecurityId": 198,
     "clientId": 2193955,
     "clientMemberCode": "20250733886",
     "notsUniqueClientCode": "202507254303305"

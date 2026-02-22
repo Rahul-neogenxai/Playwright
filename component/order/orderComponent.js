@@ -1,28 +1,21 @@
 import axios from 'axios';
 
-/*
- * Place an order directly via API using axios.
- * @param {object} page - Playwright page instance (already logged in and ready)
- * @param {object} params - { symbolToEnter, qty, priceOneDecimal, securityId, clientId, clientMemberCode, notsUniqueClientCode, hostSessionId }
- */
+// Accept cookieHeader and xsrfToken as parameters
 export async function placeOrderViaApi(page, {
   symbolToEnter,
   qty,
   priceOneDecimal,
   securityId,
+  exchangeSecurityId,
   clientId,
   clientMemberCode,
   notsUniqueClientCode,
-  hostSessionId
+  hostSessionId,
+  cookieHeader,
+  xsrfToken
 }) {
   try {
-    // 1. Get cookies and XSRF token from the browser context
-    const cookies = await page.context().cookies();
-    const cookieHeader = cookies.map(c => `${c.name}=${c.value}`).join('; ');
-    const xsrfCookie = cookies.find(c => c.name === 'XSRF-TOKEN');
-    const xsrfToken = xsrfCookie ? xsrfCookie.value : '';
-
-    // 2. Prepare headers
+    // Prepare headers using passed values
     const headers = {
       'accept': 'application/json, text/plain, */*',
       'content-type': 'application/json',
@@ -35,6 +28,11 @@ export async function placeOrderViaApi(page, {
       'membercode': '48',
       'request-owner': '109298'
     };
+    // console.log('Request Headers:', headers);
+    console.log('Request Headers:', headers);
+    console.log('Cookie Header:', cookieHeader);
+    console.log('XSRF Token:', xsrfToken);
+    console.log('Hosted-Session-ID', hostSessionId);
 
     // 3. Prepare order body
     const orderBody = {
@@ -101,7 +99,7 @@ export async function placeOrderViaApi(page, {
         },
         security: {
           id: securityId,
-          exchangeSecurityId: securityId,
+          exchangeSecurityId: exchangeSecurityId,
           marketProtectionPercentage: 0,
           divisor: 100,
           boardLotQuantity: 1,
@@ -115,7 +113,7 @@ export async function placeOrderViaApi(page, {
       exchangeOrderId: null
     };
 
-    // 4. Send the POST request using axios
+    // Send the POST request using axios
     const response = await axios.post(
       'https://tms48.nepsetms.com.np/tmsapi/orderApi/order/',
       orderBody,
