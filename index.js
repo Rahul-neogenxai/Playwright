@@ -164,18 +164,18 @@ dotenv.config();
             continue; // Retry immediately after reload
           }
 
-          await page.waitForTimeout(500);
+          // await page.waitForTimeout(500);
 
           if (apiResult.error && (
             apiResult.error.includes('502 Bad Gateway') ||
             apiResult.error.includes('socket hang up')
           )) {
-            console.warn('Network/server error. Waiting 2 seconds before retry...');
-            await page.waitForTimeout(1000);
+            // console.warn('Network/server error. Waiting 2 seconds before retry...');
+            // await page.waitForTimeout(500);
           }
         } catch (err) {
           console.error('Error in loop:', err);
-          await page.waitForTimeout(2000);
+          // await page.waitForTimeout(2000);
         }
       }
 
