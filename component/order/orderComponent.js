@@ -29,10 +29,10 @@ export async function placeOrderViaApi(page, {
       'request-owner': '109298'
     };
     // console.log('Request Headers:', headers);
-    console.log('Request Headers:', headers);
-    console.log('Cookie Header:', cookieHeader);
-    console.log('XSRF Token:', xsrfToken);
-    console.log('Hosted-Session-ID', hostSessionId);
+    // console.log('Request Headers:', headers);
+    // console.log('Cookie Header:', cookieHeader);
+    // console.log('XSRF Token:', xsrfToken);
+    // console.log('Hosted-Session-ID', hostSessionId);
 
     // 3. Prepare order body
     const orderBody = {

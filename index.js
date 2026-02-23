@@ -157,8 +157,7 @@ dotenv.config();
 
           if (
             apiResult.error &&
-            apiResult.error.includes('401') &&
-            !reloadedOn401
+            apiResult.error.includes('401') 
           ) {
             console.log('Received 401. Reloading page and retrying once...');
             await page.reload({ waitUntil: 'networkidle' });
@@ -172,7 +171,7 @@ dotenv.config();
             apiResult.error.includes('socket hang up')
           )) {
             console.warn('Network/server error. Waiting 2 seconds before retry...');
-            await page.waitForTimeout(500);
+            await page.waitForTimeout(1000);
           }
         } catch (err) {
           console.error('Error in loop:', err);
