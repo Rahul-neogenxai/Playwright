@@ -150,7 +150,7 @@ dotenv.config();
 
           console.log(`Attempt ${attempt}:`, apiResult);
 
-          if (apiResult.status === 200) {
+          if (apiResult.status === '200') {
             console.log('Trade successful!');
             break;
           }
